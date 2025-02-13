@@ -1,0 +1,153 @@
+.login {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Optional: semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Ensure it is on top */
+}
+
+.login-container {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 300px;
+}
+
+.login-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.login-title h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.login-title img {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
+
+.login-input input {
+  width: calc(100% - 20px);
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.login-container button {
+  width: 93%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background: #007BFF;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-left: 0px;
+}
+
+.login-container button:hover {
+  background: #0056b3;
+}
+
+.login-condition {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.login-condition input {
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.login-condition p {
+  margin-left: 0; /* reset margin left */
+}
+
+.login-condition a {
+  text-decoration: none;
+  color: #007BFF;
+}
+
+.login-condition a:hover {
+  text-decoration: underline;
+}
+
+.login-condition span {
+  font-size: 0.9rem;
+  color: #333;
+  margin-left: 5px;
+}
+.login-container p {
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.login-container p span {
+  color: #007BFF;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.login-container p span:hover {
+  text-decoration: underline;
+}
+
+
+/* Media queries for smaller screens */
+@media (max-width: 768px) {
+  .login-container {
+      width: 80%;
+      padding: 15px;
+  }
+
+  .login-title h2 {
+      font-size: 1.2rem;
+  }
+
+  .login-input input {
+      width: calc(100% - 15px);
+  }
+
+  .login-container button {
+      width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+      width: 90%;
+      padding: 10px;
+  }
+
+  .login-title h2 {
+      font-size: 1rem;
+  }
+
+  .login-input input {
+      width: calc(100% - 10px);
+  }
+
+  .login-container button {
+      width: 85%;
+  }
+}

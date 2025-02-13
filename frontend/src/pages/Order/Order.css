@@ -1,0 +1,134 @@
+/* Order.css */
+.place-order {
+    width: 90%;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+  }
+  
+  .place-order-left, .place-order-right {
+    width: 48%;
+  }
+  
+  .place-order-left {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  .place-order-left .title {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .multi-fields {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .multi-fields input {
+    width: 48%;
+  }
+  
+  input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  input[type="text"], input[type="email"], select, textarea {
+    font-size: 1em;
+  }
+  
+  textarea {
+    height: 100px;
+    resize: none;
+  }
+  
+  label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+  }
+  
+  .cake-design-shape select {
+    font-size: 1em;
+  }
+  
+  .order-notes textarea {
+    font-size: 1em;
+  }
+  
+  .delivery-time .react-datepicker-wrapper {
+    width: 100%;
+  }
+  
+  .delivery-time .react-datepicker__input-container input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    cursor: pointer;
+  }
+  
+  .place-order-right {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  .cart-total {
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  .cart-total h2 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .cart-total-details {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 1em;
+  }
+  
+  .cart-total-details p {
+    margin: 0;
+  }
+  
+  button[type="submit"] {
+    background-color: #f8b400;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    width: 100%;
+  }
+  
+  button[type="submit"]:hover {
+    background-color: #e09c00;
+  }
+  
+  @media (max-width: 768px) {
+    .place-order {
+      flex-direction: column;
+    }
+  
+    .place-order-left, .place-order-right {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+  }
+  

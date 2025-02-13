@@ -1,0 +1,118 @@
+
+.add {
+  width: 100%;
+  margin-left: max(5vw,25px);
+  margin: 30px;
+  color: #6d6d6d;
+  font-size: 16px;
+}
+
+.add form {
+  width: calc(100% - 60px); /* Adjust width dynamically */
+  max-width: 1000px; 
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-left: auto; /* Position to the right */
+  margin-right: auto; /* Position to the left */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  
+}
+
+.add-img-upload {
+  margin-bottom: 20px;
+  width: 200px;
+}
+
+.add-img-upload p {
+  margin-bottom: 8px;
+}
+
+.add-img-upload label {
+  cursor: pointer;
+}
+
+.add-img-upload img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.add-product-name,
+.add-product-description {
+  margin-bottom: 20px;
+}
+
+.add-product-name p,
+.add-product-description p {
+  margin-bottom: 8px;
+}
+
+.add-product-description{
+  height: 150px;
+}
+.add-product-name input,
+.add-product-description textarea,
+.add-cat select,
+.add-price input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.add-cat-price {
+  display: flex;
+  gap: 20px;
+}
+
+.add-cat,
+.add-price {
+  flex: 1;
+}
+
+.add-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin-top: 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  width: 170px;
+  margin-left: 400px;
+}
+
+.add-btn:hover {
+  background-color: #45a049;
+}
+
+/* Media Query for Responsive Design */
+
+@media (max-width: 768px) {
+  .add {
+    padding: 10px;
+  }
+
+  .add form {
+    padding: 15px;
+  }
+
+  .add-img-upload img {
+    max-height: 200px;
+  }
+
+  .add-product-name input,
+  .add-product-description textarea,
+  .add-cat select,
+  .add-price input {
+    font-size: 14px;
+  }
+}
