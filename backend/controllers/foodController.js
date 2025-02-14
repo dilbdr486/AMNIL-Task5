@@ -80,7 +80,11 @@ const searchFood = async (req, res) => {
   try {
     const search = req.body.search;
     const foodData = await foodModel.find({
-      name: { $regex: ".*" + search + ".*" },
+      $or: [
+        { name: { $regex: ".*" + search + ".*", $options: "i" } },
+        { category: { $regex: ".*" + search + ".*", $options: "i" } },
+        { description: { $regex: ".*" + search + ".*", $options: "i" } }
+      ]
     });
     if (foodData.length > 0) {
       res.json({ success: true, message: "Food details", data: foodData });
