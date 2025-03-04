@@ -71,6 +71,12 @@ const Navbar = ({ setShowLogin }) => {
         >
           <a href="#footer">Contact</a>
         </li>
+        <li
+          onClick={() => setmenu("report")}
+          className={menu === "report" ? "active" : ""}
+        >
+          <Link to="/report">Report</Link> {/* Add link to Report page */}
+        </li>
       </ul>
       <div className="navbar_right">
         <div className="navbar_search">

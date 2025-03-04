@@ -9,9 +9,9 @@ const StoreContextProvider = (props) => {
   const url = "http://localhost:4000";
   const [token, setToken] = useState("");
   const [food_list, setFoodList] = useState([]);
-  const [totalItems, setTotalItems] = useState(0); // For the total number of food items
-  const [totalPages, setTotalPages] = useState(0); // For the total number of pages
-  const [currentPage, setCurrentPage] = useState(1); // For the current page
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
@@ -73,10 +73,10 @@ const StoreContextProvider = (props) => {
   const fetchFoodList = async (page = 1, limit = 4) => {
     try {
       const response = await axios.get(`${url}/api/food/list?page=${page}&limit=${limit}`);
-      setFoodList(response.data.data); // Set the food items
-      setTotalItems(response.data.totalCount); // Set the total number of items
-      setTotalPages(response.data.totalPages); // Set the total number of pages
-      setCurrentPage(response.data.currentPage); // Set the current page
+      setFoodList(response.data.data);
+      setTotalItems(response.data.totalCount);
+      setTotalPages(response.data.totalPages);
+      setCurrentPage(response.data.currentPage);
     } catch (error) {
       console.error("Error fetching food list", error);
     }
@@ -127,8 +127,8 @@ const StoreContextProvider = (props) => {
     fetchFoodList,
     totalItems,
     totalPages,
-    currentPage,  // Added currentPage
-    setCurrentPage,  // Added setter for currentPage
+    currentPage,
+    setCurrentPage,
   };
 
   return (

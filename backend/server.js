@@ -7,9 +7,13 @@ import userRouter from './routes/userRoute.js';
 import 'dotenv/config'
 import cartRouter from './routes/cartRoute.js';
 import orderRouter from './routes/orderRoute.js';
+import reportRoutes from './routes/reportRoutes.js'; // Import report routes
+import paymentRouter from './routes/payment.js';
+import orderModel from "./models/orderModel.js"; // Import order model
+
 // app config
 const app = express()
-const port = 4000
+const port = process.env.PORT || 4000
 
 // middlewares
 app.use(cors())
@@ -27,9 +31,9 @@ app.use("/api/user",userRouter)
 app.use("/api/cart",cartRouter)
 app.use("/api/order",orderRouter)
 app.use("/api/payment",paymentRouter)
+app.use("/api/reports", reportRoutes); // Use report routes
 
 import dotenv from 'dotenv';
-import paymentRouter from './routes/payment.js';
 if(process.env.NODE_ENV != "production"){
   dotenv.config();
 }
