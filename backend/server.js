@@ -9,6 +9,7 @@ import cartRouter from './routes/cartRoute.js';
 import orderRouter from './routes/orderRoute.js';
 import reportRoutes from './routes/reportRoutes.js'; // Import report routes
 import paymentRouter from './routes/payment.js';
+import mongoose from 'mongoose';
 
 // app config
 const app = express()
@@ -17,7 +18,6 @@ const port = process.env.PORT || 4000
 // middlewares
 app.use(cors())
 app.use(express.json())
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // db connection

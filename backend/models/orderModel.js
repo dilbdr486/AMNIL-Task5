@@ -73,29 +73,6 @@ orderSchema.statics.generateTotalReport = async function (startDate, endDate) {
   return report;
 };
 
-orderSchema.statics.insertCustomOrders = async function () {
-  const customOrders = Array.from({ length: 50 }, (_, i) => ({
-    userId: `user${i + 1}`,
-    items: [
-      { productId: `product${i * 2 + 1}`, quantity: Math.floor(Math.random() * 5) + 1 },
-      { productId: `product${i * 2 + 2}`, quantity: Math.floor(Math.random() * 5) + 1 },
-    ],
-    amount: Math.floor(Math.random() * 1000) + 50,
-    address: { city: `City${i + 1}`, street: `Street${i + 1}` },
-    status: "Delivered",
-    date: new Date(2023, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-    payment: true,
-  }));
-
-  await this.insertMany(customOrders);
-};
-
-orderSchema.statics.verifyCustomOrders = async function () {
-  const count = await this.countDocuments();
-  console.log(`Total orders in the database: ${count}`);
-  return count;
-};
-
 const orderModel = mongoose.models.order || mongoose.model("order", orderSchema);
 
 export default orderModel;

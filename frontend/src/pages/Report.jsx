@@ -23,23 +23,6 @@ const Report = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const fillMissingData = (data, type) => {
-    const filledData = [];
-    const totalPeriods = {
-      day: 30,
-      week: 52,
-      month: 12,
-      year: 10,
-    }[type];
-
-    for (let i = 0; i < totalPeriods; i++) {
-      const existingData = data.find((item, index) => index === i);
-      filledData.push(existingData || { totalSales: 0, totalRevenue: 0, index: i });
-    }
-
-    return filledData;
-  };
-
   const fetchReport = async () => {
     if (!startDate || !endDate) {
       setError("Please select both start and end dates.");
@@ -59,9 +42,7 @@ const Report = () => {
 
       // Ensure the backend response is in the expected format
       if (Array.isArray(response.data)) {
-        const filledData = fillMissingData(response.data, reportType);
-        console.log("Fetched report data:", filledData); // Log the filled data
-        setReportData(filledData);
+        setReportData(response.data);
       } else {
         setError("Invalid data format from the server.");
       }
@@ -147,7 +128,7 @@ const Report = () => {
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={reportData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="index" tickFormatter={(index) => formatXAxis(index)} />
+              <XAxis dataKey="_id" tickFormatter={(index) => formatXAxis(index)} />
               <YAxis tickFormatter={(value) => `$${value}`} />
               <Tooltip />
               <Legend />
@@ -157,16 +138,16 @@ const Report = () => {
         </div>
         <div className="bg-white p-4 rounded-lg shadow-md">
           <h2 className="text-xl font-bold mb-4">
-            {reportType.charAt(0).toUpperCase() + reportType.slice(1)}-wise Revenue
+            {reportType.charAt(0).toUpperCase() + reportType.slice(1)}-wise Products
           </h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={reportData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="index" tickFormatter={(index) => formatXAxis(index)} />
-              <YAxis tickFormatter={(value) => `$${value}`} />
+              <XAxis dataKey="_id" tickFormatter={(index) => formatXAxis(index)} />
+              <YAxis tickFormatter={(value) => `${value}`} />
               <Tooltip />
               <Legend />
-              <Bar dataKey="totalRevenue" fill="#82ca9d" />
+              <Bar dataKey="totalProducts" fill="#82ca9d" />
             </BarChart>
           </ResponsiveContainer>
         </div>
