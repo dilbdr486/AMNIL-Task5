@@ -95,7 +95,7 @@ orderSchema.statics.calculateConversionRate = async function (startDate, endDate
   const visitors = totalVisitors[0]?.totalVisitors || 1; // Avoid division by zero
   const conversionRate = (totalOrders / visitors) * 100; // Convert to percentage
 
-  return conversionRate;
+  return conversionRate.toFixed(2); // Return as a fixed decimal string
 };
 
 orderSchema.statics.calculateYoYGrowth = async function (startDate, endDate) {
@@ -113,30 +113,24 @@ orderSchema.statics.calculateYoYGrowth = async function (startDate, endDate) {
 orderSchema.statics.calculateMoMGrowth = async function (startDate, endDate) {
   const currentPeriodSales = await this.calculateTotalSales(startDate, endDate);
 
+  // Clone the start and end date objects to avoid modifying the originals
   const previousMonthStartDate = new Date(startDate);
   previousMonthStartDate.setMonth(previousMonthStartDate.getMonth() - 1);
-  const previousMonthEndDate = new Date(endDate);
-  previousMonthEndDate.setMonth(previousMonthEndDate.getMonth() - 1);
+  previousMonthStartDate.setDate(1); // Set to the first day of the previous month
 
-  // Adjust the day to ensure the range is correct
-  previousMonthStartDate.setDate(1);
-  previousMonthEndDate.setDate(new Date(previousMonthEndDate.getFullYear(), previousMonthEndDate.getMonth() + 1, 0).getDate());
-
-  console.log("Previous Month Start Date:", previousMonthStartDate);
-  console.log("Previous Month End Date:", previousMonthEndDate);
+  const previousMonthEndDate = new Date(startDate);
+  previousMonthEndDate.setDate(0); // Set to the last day of the previous month
 
   const previousPeriodSales = await this.calculateTotalSales(previousMonthStartDate, previousMonthEndDate);
 
-  console.log("Current Period Sales:", currentPeriodSales);
-  console.log("Previous Period Sales:", previousPeriodSales);
-
   if (previousPeriodSales === 0) {
-    return 0; // Avoid division by zero
+    return currentPeriodSales === 0 ? 0 : 100;
   }
 
   const momGrowth = ((currentPeriodSales - previousPeriodSales) / previousPeriodSales) * 100;
-  return momGrowth;
+  return parseFloat(momGrowth.toFixed(2));
 };
+
 
 const orderModel = mongoose.models.order || mongoose.model("order", orderSchema);
 

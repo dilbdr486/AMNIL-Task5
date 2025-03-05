@@ -73,7 +73,7 @@ const Report = () => {
       const conversionRateResponse = await axios.get(`${url}/api/reports/conversion-rate`, {
         params: { startDate, endDate },
       });
-      setConversionRate(conversionRateResponse.data.conversionRate || 0);
+      setConversionRate(parseFloat(conversionRateResponse.data.conversionRate) || 0);
 
       // Fetch YoY growth
       const yoyGrowthResponse = await axios.get(`${url}/api/reports/yoy-growth`, {
@@ -85,7 +85,7 @@ const Report = () => {
       const momGrowthResponse = await axios.get(`${url}/api/reports/mom-growth`, {
         params: { startDate, endDate },
       });
-      setMoMGrowth(momGrowthResponse.data.momGrowth || 0);
+      setMoMGrowth(parseFloat(momGrowthResponse.data.momGrowth) || 0);
     } catch (error) {
       // Improved error handling
       if (error.response) {
@@ -131,7 +131,7 @@ const Report = () => {
         </div>
         <div className="bg-white p-4 rounded-lg shadow-md">
           <h2 className="text-xl font-bold mb-2">Conversion Rate</h2>
-          <p className="text-2xl">{conversionRate.toFixed(2)}%</p>
+          <p className="text-2xl">{Number(conversionRate).toFixed(2)}%</p>
         </div>
         <div className="bg-white p-4 rounded-lg shadow-md">
           <h2 className="text-xl font-bold mb-2">YoY Growth</h2>
@@ -139,7 +139,7 @@ const Report = () => {
         </div>
         <div className="bg-white p-4 rounded-lg shadow-md">
           <h2 className="text-xl font-bold mb-2">MoM Growth</h2>
-          <p className="text-2xl">{momGrowth.toFixed(2)}%</p>
+          <p className="text-2xl">{Number(momGrowth).toFixed(2)}%</p>
         </div>
       </div>
 

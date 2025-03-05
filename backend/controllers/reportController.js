@@ -145,6 +145,7 @@ export const getYoYGrowth = async (req, res) => {
 export const getMoMGrowth = async (req, res) => {
   const { startDate, endDate } = req.query;
   try {
+    console.log("Request to get MoM growth from", startDate, "to", endDate);
     const momGrowth = await orderModel.calculateMoMGrowth(startDate, endDate);
     res.json({ momGrowth });
   } catch (error) {
