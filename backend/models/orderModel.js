@@ -19,11 +19,10 @@ const orderSchema = new mongoose.Schema(
 );
 
 orderSchema.statics.calculateTotalSales = async function (startDate, endDate) {
-  const sales = await this.aggregate([
-    { $match: { date: { $gte: new Date(startDate), $lte: new Date(endDate) } } },
-    { $group: { _id: null, totalSales: { $sum: "$amount" } } },
-  ]);
-  return sales[0]?.totalSales || 0;
+  const sales = await this.countDocuments({
+    date: { $gte: new Date(startDate), $lte: new Date(endDate) },
+  });
+  return sales;
 };
 
 orderSchema.statics.generateDayWiseReport = async function (startDate, endDate) {

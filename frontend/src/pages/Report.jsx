@@ -119,7 +119,7 @@ const Report = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-4 rounded-lg shadow-md">
           <h2 className="text-xl font-bold mb-2">Total Sales</h2>
-          <p className="text-2xl">${totalSales}</p>
+          <p className="text-2xl">{totalSales}</p>
         </div>
         <div className="bg-white p-4 rounded-lg shadow-md">
           <h2 className="text-xl font-bold mb-2">Total Revenue</h2>
