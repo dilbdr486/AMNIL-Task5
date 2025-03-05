@@ -131,3 +131,23 @@ export const getAllOrders = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getYoYGrowth = async (req, res) => {
+  const { startDate, endDate } = req.query;
+  try {
+    const yoyGrowth = await orderModel.calculateYoYGrowth(startDate, endDate);
+    res.json({ yoyGrowth });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getMoMGrowth = async (req, res) => {
+  const { startDate, endDate } = req.query;
+  try {
+    const momGrowth = await orderModel.calculateMoMGrowth(startDate, endDate);
+    res.json({ momGrowth });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

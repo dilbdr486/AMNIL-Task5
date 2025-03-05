@@ -131,6 +131,28 @@ reportRoutes.get("/top-searched-products", async (req, res) => {
   }
 });
 
+// Year-over-Year (YoY) Growth Route
+reportRoutes.get("/yoy-growth", async (req, res) => {
+  const { startDate, endDate } = req.query;
+  try {
+    const yoyGrowth = await orderModel.calculateYoYGrowth(startDate, endDate);
+    res.json({ yoyGrowth });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Month-over-Month (MoM) Growth Route
+reportRoutes.get("/mom-growth", async (req, res) => {
+  const { startDate, endDate } = req.query;
+  try {
+    const momGrowth = await orderModel.calculateMoMGrowth(startDate, endDate);
+    res.json({ momGrowth });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Insert Custom Orders Route
 reportRoutes.post("/insert-custom-orders", async (req, res) => {
   try {

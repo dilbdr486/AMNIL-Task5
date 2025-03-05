@@ -98,6 +98,46 @@ orderSchema.statics.calculateConversionRate = async function (startDate, endDate
   return conversionRate;
 };
 
+orderSchema.statics.calculateYoYGrowth = async function (startDate, endDate) {
+  const currentPeriodSales = await this.calculateTotalSales(startDate, endDate);
+  const previousYearStartDate = new Date(startDate);
+  previousYearStartDate.setFullYear(previousYearStartDate.getFullYear() - 1);
+  const previousYearEndDate = new Date(endDate);
+  previousYearEndDate.setFullYear(previousYearEndDate.getFullYear() - 1);
+  const previousPeriodSales = await this.calculateTotalSales(previousYearStartDate, previousYearEndDate);
+
+  const yoyGrowth = ((currentPeriodSales - previousPeriodSales) / previousPeriodSales) * 100;
+  return yoyGrowth;
+};
+
+orderSchema.statics.calculateMoMGrowth = async function (startDate, endDate) {
+  const currentPeriodSales = await this.calculateTotalSales(startDate, endDate);
+
+  const previousMonthStartDate = new Date(startDate);
+  previousMonthStartDate.setMonth(previousMonthStartDate.getMonth() - 1);
+  const previousMonthEndDate = new Date(endDate);
+  previousMonthEndDate.setMonth(previousMonthEndDate.getMonth() - 1);
+
+  // Adjust the day to ensure the range is correct
+  previousMonthStartDate.setDate(1);
+  previousMonthEndDate.setDate(new Date(previousMonthEndDate.getFullYear(), previousMonthEndDate.getMonth() + 1, 0).getDate());
+
+  console.log("Previous Month Start Date:", previousMonthStartDate);
+  console.log("Previous Month End Date:", previousMonthEndDate);
+
+  const previousPeriodSales = await this.calculateTotalSales(previousMonthStartDate, previousMonthEndDate);
+
+  console.log("Current Period Sales:", currentPeriodSales);
+  console.log("Previous Period Sales:", previousPeriodSales);
+
+  if (previousPeriodSales === 0) {
+    return 0; // Avoid division by zero
+  }
+
+  const momGrowth = ((currentPeriodSales - previousPeriodSales) / previousPeriodSales) * 100;
+  return momGrowth;
+};
+
 const orderModel = mongoose.models.order || mongoose.model("order", orderSchema);
 
 export default orderModel;
