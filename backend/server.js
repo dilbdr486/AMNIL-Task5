@@ -9,7 +9,6 @@ import cartRouter from './routes/cartRoute.js';
 import orderRouter from './routes/orderRoute.js';
 import reportRoutes from './routes/reportRoutes.js'; // Import report routes
 import paymentRouter from './routes/payment.js';
-import orderModel from "./models/orderModel.js"; // Import order model
 
 // app config
 const app = express()

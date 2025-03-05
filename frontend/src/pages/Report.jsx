@@ -1,200 +1,174 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { StoreContext } from "../store/StoreContext"; // Import the StoreContext
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 const Report = () => {
+  const { url } = useContext(StoreContext); // Access the url from the context
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [dayWiseReport, setDayWiseReport] = useState([]);
-  const [totalReport, setTotalReport] = useState([]);
-  const [topSearchedProducts, setTopSearchedProducts] = useState([]);
-  const [reportType, setReportType] = useState("day"); // New state for report type
+  const [reportType, setReportType] = useState("day");
+  const [reportData, setReportData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const fetchDayWiseReport = async () => {
-    try {
-      const response = await axios.get("http://localhost:4000/api/reports/day-wise-report", {
-        params: { startDate, endDate },
-      });
-      console.log("Day-wise report data:", response.data); // Debug log
-      setDayWiseReport(response.data);
-    } catch (error) {
-      console.error("Error fetching day-wise report:", error);
+  const fillMissingData = (data, type) => {
+    const filledData = [];
+    const totalPeriods = {
+      day: 30,
+      week: 52,
+      month: 12,
+      year: 10,
+    }[type];
+
+    for (let i = 0; i < totalPeriods; i++) {
+      const existingData = data.find((item, index) => index === i);
+      filledData.push(existingData || { totalSales: 0, totalRevenue: 0, index: i });
     }
+
+    return filledData;
   };
 
-  const fetchTotalReport = async () => {
-    try {
-      const response = await axios.get("http://localhost:4000/api/reports/total-report", {
-        params: { startDate, endDate },
-      });
-      console.log("Total report data:", response.data); // Debug log
-      setTotalReport(response.data);
-    } catch (error) {
-      console.error("Error fetching total report:", error);
+  const fetchReport = async () => {
+    if (!startDate || !endDate) {
+      setError("Please select both start and end dates.");
+      return;
     }
-  };
 
-  const fetchTopSearchedProducts = async () => {
+    setLoading(true);
+    setError(""); // Clear previous error
+
     try {
-      const response = await axios.get("http://localhost:4000/api/reports/top-searched-products", {
-        params: { startDate, endDate },
-      });
-      console.log("Top searched products data:", response.data); // Debug log
-      setTopSearchedProducts(response.data);
+      const response = await axios.get(
+        `${url}/api/reports/${reportType}-wise-report`, // Use the url from context
+        {
+          params: { startDate, endDate },
+        }
+      );
+
+      // Ensure the backend response is in the expected format
+      if (Array.isArray(response.data)) {
+        const filledData = fillMissingData(response.data, reportType);
+        console.log("Fetched report data:", filledData); // Log the filled data
+        setReportData(filledData);
+      } else {
+        setError("Invalid data format from the server.");
+      }
     } catch (error) {
-      console.error("Error fetching top searched products:", error.response ? error.response.data : error.message);
+      // Improved error handling
+      if (error.response) {
+        setError(`Error: ${error.response.data.message || error.response.data}`);
+      } else {
+        setError("Network error or server not reachable.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     if (startDate && endDate) {
-      fetchDayWiseReport();
-      fetchTotalReport();
-      fetchTopSearchedProducts();
+      fetchReport();
     }
-  }, [startDate, endDate]);
+  }, [startDate, endDate, reportType]);
 
-  const generateLabels = (type) => {
-    if (type === "day") {
-      return Array.from({ length: 30 }, (_, index) => `Day ${index + 1}`);
-    } else if (type === "week") {
-      return Array.from({ length: 4 }, (_, index) => `Week ${index + 1}`);
-    } else {
-      return Array.from({ length: 12 }, (_, index) => `Month ${index + 1}`);
-    }
-  };
-
-  const fillMissingData = (data, labels) => {
-    const filledData = labels.map(label => {
-      const existingData = data.find(item => item.name === label);
-      return existingData || { name: label, totalSales: 0, totalProducts: 0 };
-    });
-    return filledData;
-  };
-
-  const labels = generateLabels(reportType);
-  const dayWiseData = fillMissingData(dayWiseReport.map((report, index) => ({
-    name: `Day ${index + 1}`,
-    totalSales: report.totalSales,
-    totalProducts: report.totalProducts,
-  })), labels);
-
-  const weekWiseData = fillMissingData(dayWiseReport.map((report, index) => ({
-    name: `Week ${index + 1}`,
-    totalSales: report.totalSales,
-    totalProducts: report.totalProducts,
-  })), labels);
-
-  const monthWiseData = fillMissingData(Array.from({ length: 12 }, (_, index) => ({
-    name: `Month ${index + 1}`,
-    totalSales: Math.floor(Math.random() * 1000),
-    totalProducts: Math.floor(Math.random() * 100),
-  })), labels);
-
-  const totalReportData = totalReport.map((report, index) => ({
-    name: `Item ${index + 1}`,
-    totalQuantity: report.totalQuantity,
-    totalRevenue: report.totalRevenue,
-  }));
-
-  const topSearchedProductsData = topSearchedProducts.map((product, index) => ({
-    name: `Product ${index + 1}`,
-    count: product.count,
-  }));
-
-  const calculateTotalRevenueAndSales = (data) => {
-    return data.reduce((acc, item) => {
-      acc.totalRevenue += item.totalRevenue || 0;
-      acc.totalSales += item.totalSales || 0;
-      return acc;
-    }, { totalRevenue: 0, totalSales: 0 });
-  };
-
-  const totalRevenueAndSales = calculateTotalRevenueAndSales(totalReportData);
-
-  const renderChart = (data, dataKey, title) => {
-    if (data.length === 0) {
-      return <div className="h-96 flex items-center justify-center">Data not found</div>;
-    }
-    return (
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis tickFormatter={(value) => `$${value}`} />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey={dataKey} fill="#8884d8" />
-        </BarChart>
-      </ResponsiveContainer>
-    );
+  const formatXAxis = (index) => {
+    if (reportType === "day") return `Day ${index + 1}`;
+    if (reportType === "week") return `Week ${index + 1}`;
+    if (reportType === "month") return `Month ${index + 1}`;
+    if (reportType === "year") return `Year ${index + 1}`;
+    return index;
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Report</h1>
-      <div className="mb-4">
-        <label className="block mb-2">Start Date:</label>
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          className="border p-2"
-        />
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <h1 className="text-3xl font-bold mb-6">Sales Analytics Dashboard</h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div>
+          <label className="block mb-1">Start Date:</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+        <div>
+          <label className="block mb-1">End Date:</label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+        <div>
+          <label className="block mb-1">Report Type:</label>
+          <select
+            value={reportType}
+            onChange={(e) => setReportType(e.target.value)}
+            className="w-full border p-2 rounded"
+          >
+            <option value="day">Day-wise</option>
+            <option value="week">Week-wise</option>
+            <option value="month">Month-wise</option>
+            <option value="year">Year-wise</option>
+          </select>
+        </div>
       </div>
-      <div className="mb-4">
-        <label className="block mb-2">End Date:</label>
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          className="border p-2"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block mb-2">Report Type:</label>
-        <select
-          value={reportType}
-          onChange={(e) => setReportType(e.target.value)}
-          className="border p-2"
-        >
-          <option value="day">Day-wise</option>
-          <option value="week">Week-wise</option>
-          <option value="month">Month-wise</option>
-        </select>
-      </div>
-      <div className="mb-4">
-        <h2 className="text-xl font-bold">{reportType === "day" ? "Day-wise Report" : reportType === "week" ? "Week-wise Report" : "Month-wise Report"}</h2>
-        <div className="h-96">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={reportType === "month" ? monthWiseData : reportType === "week" ? weekWiseData : dayWiseData}>
+
+      <button
+        className="bg-black text-white px-4 py-2 rounded mb-6"
+        onClick={fetchReport}
+        disabled={loading}
+      >
+        {loading ? "Generating Report..." : "Generate Report"}
+      </button>
+
+      {error && <div className="text-red-500 mb-6">{error}</div>}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold mb-4">
+            {reportType.charAt(0).toUpperCase() + reportType.slice(1)}-wise Sales
+          </h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={reportData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
+              <XAxis dataKey="index" tickFormatter={(index) => formatXAxis(index)} />
               <YAxis tickFormatter={(value) => `$${value}`} />
               <Tooltip />
               <Legend />
               <Line type="monotone" dataKey="totalSales" stroke="#8884d8" />
-              <Line type="monotone" dataKey="totalProducts" stroke="#82ca9d" />
             </LineChart>
           </ResponsiveContainer>
         </div>
-      </div>
-      <div className="mb-4">
-        <h2 className="text-xl font-bold">Total Report</h2>
-        <div className="h-96">
-          {renderChart(totalReportData, "totalRevenue", "Total Report")}
-        </div>
-      </div>
-      <div className="mb-4">
-        <h2 className="text-xl font-bold">Top Searched Products</h2>
-        <div className="h-96">
-          {renderChart(topSearchedProductsData, "count", "Top Searched Products")}
-        </div>
-      </div>
-      <div className="mb-4">
-        <h2 className="text-xl font-bold">Total Revenue and Sales</h2>
-        <div className="h-96">
-          {renderChart([{ name: "Total", ...totalRevenueAndSales }], "totalRevenue", "Total Revenue and Sales")}
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold mb-4">
+            {reportType.charAt(0).toUpperCase() + reportType.slice(1)}-wise Revenue
+          </h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={reportData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="index" tickFormatter={(index) => formatXAxis(index)} />
+              <YAxis tickFormatter={(value) => `$${value}`} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="totalRevenue" fill="#82ca9d" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>
