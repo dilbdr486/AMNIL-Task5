@@ -130,6 +130,23 @@ orderSchema.statics.calculateMoMGrowth = async function (startDate, endDate) {
   return parseFloat(momGrowth.toFixed(2));
 };
 
+orderSchema.statics.calculateGrossProfitPerProduct = async function (startDate, endDate) {
+  const report = await this.aggregate([
+    { $match: { date: { $gte: new Date(startDate), $lte: new Date(endDate) } } },
+    { $unwind: "$items" },
+    { $group: { _id: "$items.productId", totalRevenue: { $sum: "$amount" }, totalCost: { $sum: "$items.cost" } } },
+    { $project: { _id: 1, grossProfit: { $subtract: ["$totalRevenue", "$totalCost"] } } },
+    { $sort: { grossProfit: -1 } },
+  ]);
+  return report;
+};
+
+orderSchema.statics.identifyMarginProducts = async function (startDate, endDate) {
+  const report = await this.calculateGrossProfitPerProduct(startDate, endDate);
+  const highMarginProducts = report.filter(product => product.grossProfit > 1000); // Example threshold
+  const lowMarginProducts = report.filter(product => product.grossProfit <= 1000);
+  return { highMarginProducts, lowMarginProducts };
+};
 
 const orderModel = mongoose.models.order || mongoose.model("order", orderSchema);
 

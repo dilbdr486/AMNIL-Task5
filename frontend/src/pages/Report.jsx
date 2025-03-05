@@ -12,6 +12,9 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
 
 const Report = () => {
@@ -26,6 +29,8 @@ const Report = () => {
   const [conversionRate, setConversionRate] = useState(0);
   const [yoyGrowth, setYoYGrowth] = useState(0);
   const [momGrowth, setMoMGrowth] = useState(0);
+  const [grossProfitData, setGrossProfitData] = useState([]);
+  const [marginProducts, setMarginProducts] = useState({ highMarginProducts: [], lowMarginProducts: [] });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -86,6 +91,18 @@ const Report = () => {
         params: { startDate, endDate },
       });
       setMoMGrowth(parseFloat(momGrowthResponse.data.momGrowth) || 0);
+
+      // Fetch gross profit per product
+      const grossProfitResponse = await axios.get(`${url}/api/reports/gross-profit-per-product`, {
+        params: { startDate, endDate },
+      });
+      setGrossProfitData(grossProfitResponse.data);
+
+      // Fetch margin products
+      const marginProductsResponse = await axios.get(`${url}/api/reports/margin-products`, {
+        params: { startDate, endDate },
+      });
+      setMarginProducts(marginProductsResponse.data);
     } catch (error) {
       // Improved error handling
       if (error.response) {
@@ -111,6 +128,8 @@ const Report = () => {
     if (reportType === "year") return `Year ${index + 1}`;
     return index;
   };
+
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -216,6 +235,66 @@ const Report = () => {
               <Legend />
               <Bar dataKey="totalProducts" fill="#82ca9d" />
             </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold mb-4">Gross Profit Per Product</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={grossProfitData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="_id" />
+              <YAxis tickFormatter={(value) => `$${value}`} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="grossProfit" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold mb-4">High Margin Products</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={marginProducts.highMarginProducts}
+                dataKey="grossProfit"
+                nameKey="_id"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                fill="#82ca9d"
+                label
+              >
+                {marginProducts.highMarginProducts.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold mb-4">Low Margin Products</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={marginProducts.lowMarginProducts}
+                dataKey="grossProfit"
+                nameKey="_id"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                fill="#FF8042"
+                label
+              >
+                {marginProducts.lowMarginProducts.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
           </ResponsiveContainer>
         </div>
       </div>

@@ -153,6 +153,28 @@ reportRoutes.get("/mom-growth", async (req, res) => {
   }
 });
 
+// Gross Profit Per Product Route
+reportRoutes.get("/gross-profit-per-product", async (req, res) => {
+  const { startDate, endDate } = req.query;
+  try {
+    const report = await orderModel.calculateGrossProfitPerProduct(startDate, endDate);
+    res.json(report);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Margin Products Route
+reportRoutes.get("/margin-products", async (req, res) => {
+  const { startDate, endDate } = req.query;
+  try {
+    const report = await orderModel.identifyMarginProducts(startDate, endDate);
+    res.json(report);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Insert Custom Orders Route
 reportRoutes.post("/insert-custom-orders", async (req, res) => {
   try {

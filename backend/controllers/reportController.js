@@ -152,3 +152,23 @@ export const getMoMGrowth = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getGrossProfitPerProduct = async (req, res) => {
+  const { startDate, endDate } = req.query;
+  try {
+    const report = await orderModel.calculateGrossProfitPerProduct(startDate, endDate);
+    res.json(report);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getMarginProducts = async (req, res) => {
+  const { startDate, endDate } = req.query;
+  try {
+    const report = await orderModel.identifyMarginProducts(startDate, endDate);
+    res.json(report);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
