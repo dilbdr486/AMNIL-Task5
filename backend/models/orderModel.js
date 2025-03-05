@@ -73,6 +73,31 @@ orderSchema.statics.generateTotalReport = async function (startDate, endDate) {
   return report;
 };
 
+orderSchema.statics.calculateTotalRevenue = async function (startDate, endDate) {
+  const revenue = await this.aggregate([
+    { $match: { date: { $gte: new Date(startDate), $lte: new Date(endDate) } } },
+    { $group: { _id: null, totalRevenue: { $sum: "$amount" } } },
+  ]);
+  return revenue[0]?.totalRevenue || 0;
+};
+
+orderSchema.statics.calculateConversionRate = async function (startDate, endDate) {
+  const totalOrders = await this.countDocuments({
+    date: { $gte: new Date(startDate), $lte: new Date(endDate) },
+  });
+
+  // Assuming you have a separate collection or field for tracking visitors
+  const totalVisitors = await this.aggregate([
+    { $match: { date: { $gte: new Date(startDate), $lte: new Date(endDate) } } },
+    { $group: { _id: null, totalVisitors: { $sum: "$visitors" } } },
+  ]);
+
+  const visitors = totalVisitors[0]?.totalVisitors || 1; // Avoid division by zero
+  const conversionRate = (totalOrders / visitors) * 100; // Convert to percentage
+
+  return conversionRate;
+};
+
 const orderModel = mongoose.models.order || mongoose.model("order", orderSchema);
 
 export default orderModel;

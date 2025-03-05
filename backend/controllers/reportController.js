@@ -15,6 +15,30 @@ export const getTotalSales = async (req, res) => {
   }
 };
 
+// New controller function for total revenue
+export const getTotalRevenue = async (req, res) => {
+  const { startDate, endDate } = req.query;
+  try {
+    console.log("Request to get total revenue from", startDate, "to", endDate);
+    const totalRevenue = await orderModel.calculateTotalRevenue(startDate, endDate);
+    res.json({ totalRevenue });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// New controller function for conversion rate
+export const getConversionRate = async (req, res) => {
+  const { startDate, endDate } = req.query;
+  try {
+    console.log("Request to get conversion rate from", startDate, "to", endDate);
+    const conversionRate = await orderModel.calculateConversionRate(startDate, endDate);
+    res.json({ conversionRate });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export const getDayWiseReport = async (req, res) => {
   const { startDate, endDate } = req.query;
   try {

@@ -20,6 +20,10 @@ const Report = () => {
   const [endDate, setEndDate] = useState("");
   const [reportType, setReportType] = useState("day");
   const [reportData, setReportData] = useState([]);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [totalSales, setTotalSales] = useState(0);
+  const [averageOrderValue, setAverageOrderValue] = useState(0);
+  const [conversionRate, setConversionRate] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -46,6 +50,28 @@ const Report = () => {
       } else {
         setError("Invalid data format from the server.");
       }
+
+      // Fetch total revenue
+      const revenueResponse = await axios.get(`${url}/api/reports/total-revenue`, {
+        params: { startDate, endDate },
+      });
+      setTotalRevenue(revenueResponse.data.totalRevenue || 0);
+
+      // Fetch total sales
+      const salesResponse = await axios.get(`${url}/api/reports/total-sales`, {
+        params: { startDate, endDate },
+      });
+      setTotalSales(salesResponse.data.totalSales || 0);
+
+      // Calculate average order value
+      const averageOrderValue = (revenueResponse.data.totalRevenue || 0) / (salesResponse.data.totalSales || 1);
+      setAverageOrderValue(averageOrderValue);
+
+      // Fetch conversion rate
+      const conversionRateResponse = await axios.get(`${url}/api/reports/conversion-rate`, {
+        params: { startDate, endDate },
+      });
+      setConversionRate(conversionRateResponse.data.conversionRate || 0);
     } catch (error) {
       // Improved error handling
       if (error.response) {
@@ -75,6 +101,25 @@ const Report = () => {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-3xl font-bold mb-6">Sales Analytics Dashboard</h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold mb-2">Total Sales</h2>
+          <p className="text-2xl">${totalSales}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold mb-2">Total Revenue</h2>
+          <p className="text-2xl">${totalRevenue}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold mb-2">Average Order Value</h2>
+          <p className="text-2xl">${averageOrderValue.toFixed(2)}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold mb-2">Conversion Rate</h2>
+          <p className="text-2xl">{conversionRate.toFixed(2)}%</p>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
