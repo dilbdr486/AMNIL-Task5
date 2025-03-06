@@ -148,6 +148,23 @@ orderSchema.statics.identifyMarginProducts = async function (startDate, endDate)
   return { highMarginProducts, lowMarginProducts };
 };
 
+orderSchema.statics.generateTopSearchedProducts = async function (startDate, endDate) {
+  // Custom data for top searched products
+  const customData = [
+    { _id: "product1", totalSearches: 150 },
+    { _id: "product2", totalSearches: 120 },
+    { _id: "product3", totalSearches: 110 },
+    { _id: "product4", totalSearches: 100 },
+    { _id: "product5", totalSearches: 90 },
+    { _id: "product6", totalSearches: 80 },
+    { _id: "product7", totalSearches: 70 },
+    { _id: "product8", totalSearches: 60 },
+    { _id: "product9", totalSearches: 50 },
+    { _id: "product10", totalSearches: 40 },
+  ];
+  return customData;
+};
+
 const orderModel = mongoose.models.order || mongoose.model("order", orderSchema);
 
 export default orderModel;

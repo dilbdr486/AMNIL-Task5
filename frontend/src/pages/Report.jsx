@@ -31,6 +31,7 @@ const Report = () => {
   const [momGrowth, setMoMGrowth] = useState(0);
   const [grossProfitData, setGrossProfitData] = useState([]);
   const [marginProducts, setMarginProducts] = useState({ highMarginProducts: [], lowMarginProducts: [] });
+  const [topSearchedProducts, setTopSearchedProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -103,6 +104,12 @@ const Report = () => {
         params: { startDate, endDate },
       });
       setMarginProducts(marginProductsResponse.data);
+
+      // Fetch top searched products
+      const topSearchedProductsResponse = await axios.get(`${url}/api/reports/top-searched-products`, {
+        params: { startDate, endDate },
+      });
+      setTopSearchedProducts(topSearchedProductsResponse.data);
     } catch (error) {
       // Improved error handling
       if (error.response) {
@@ -290,6 +297,28 @@ const Report = () => {
                 label
               >
                 {marginProducts.lowMarginProducts.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold mb-4">Top 10 Searched Products</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={topSearchedProducts}
+                dataKey="totalSearches"
+                nameKey="_id"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                fill="#8884d8"
+                label
+              >
+                {topSearchedProducts.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
