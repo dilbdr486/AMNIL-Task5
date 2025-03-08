@@ -165,6 +165,43 @@ orderSchema.statics.generateTopSearchedProducts = async function (startDate, end
   return customData;
 };
 
+orderSchema.statics.getProductSalesHistory = async function (productId, startDate, endDate) {
+  console.log("Fetching sales history for product:", productId, "from", startDate, "to", endDate);
+  const salesHistory = await this.aggregate([
+    { $match: { date: { $gte: new Date(startDate), $lte: new Date(endDate) }, "items.productId": productId } },
+    { $unwind: "$items" },
+    { $match: { "items.productId": productId } },
+    { $group: { _id: "$date", totalQuantity: { $sum: "$items.quantity" }, totalRevenue: { $sum: { $multiply: ["$items.quantity", "$items.price"] } } } },
+    { $sort: { "_id": 1 } },
+  ]);
+  console.log("Sales history result:", salesHistory);
+  return salesHistory;
+};
+
+orderSchema.statics.calculateSalesForNewCustomers = async function (startDate, endDate) {
+  // Custom data for new customers
+  const customData = 5000; // Example value
+  return customData;
+};
+
+orderSchema.statics.calculateSalesForRepeatCustomers = async function (startDate, endDate) {
+  // Custom data for repeat customers
+  const customData = 15000; // Example value
+  return customData;
+};
+
+orderSchema.statics.getTopCustomerSegments = async function (startDate, endDate) {
+  // Custom data for top customer segments
+  const customData = [
+    { _id: "Segment A", totalRevenue: 10000 },
+    { _id: "Segment B", totalRevenue: 8000 },
+    { _id: "Segment C", totalRevenue: 6000 },
+    { _id: "Segment D", totalRevenue: 4000 },
+    { _id: "Segment E", totalRevenue: 2000 },
+  ];
+  return customData;
+};
+
 const orderModel = mongoose.models.order || mongoose.model("order", orderSchema);
 
 export default orderModel;

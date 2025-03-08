@@ -34,6 +34,9 @@ const Report = () => {
   const [topSearchedProducts, setTopSearchedProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [productSalesHistory, setProductSalesHistory] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [customerSalesAnalysis, setCustomerSalesAnalysis] = useState({ newCustomers: 0, repeatCustomers: 0, topCustomerSegments: [] });
 
   const fetchReport = async () => {
     if (!startDate || !endDate) {
@@ -122,9 +125,39 @@ const Report = () => {
     }
   };
 
+  const fetchProductSalesHistory = async (productId) => {
+    try {
+      const response = await axios.get(`${url}/api/reports/product-sales-history`, {
+        params: { productId, startDate, endDate },
+      });
+      setProductSalesHistory(response.data);
+      setSelectedProduct(productId);
+    } catch (error) {
+      setError("Failed to fetch product sales history.");
+    }
+  };
+
+  const handleDataPointClick = (e) => {
+    if (e && e.activePayload && e.activePayload[0] && e.activePayload[0].payload) {
+      fetchProductSalesHistory(e.activePayload[0].payload._id);
+    }
+  };
+
+  const fetchCustomerSalesAnalysis = async () => {
+    try {
+      const response = await axios.get(`${url}/api/reports/customer-sales-analysis`, {
+        params: { startDate, endDate },
+      });
+      setCustomerSalesAnalysis(response.data);
+    } catch (error) {
+      setError("Failed to fetch customer sales analysis.");
+    }
+  };
+
   useEffect(() => {
     if (startDate && endDate) {
       fetchReport();
+      fetchCustomerSalesAnalysis();
     }
   }, [startDate, endDate, reportType]);
 
@@ -219,7 +252,7 @@ const Report = () => {
             {reportType.charAt(0).toUpperCase() + reportType.slice(1)}-wise Sales
           </h2>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={reportData}>
+            <LineChart data={reportData} onClick={handleDataPointClick}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="_id" tickFormatter={(index) => formatXAxis(index)} />
               <YAxis tickFormatter={(value) => `$${value}`} />
@@ -319,6 +352,81 @@ const Report = () => {
                 label
               >
                 {topSearchedProducts.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {selectedProduct && (
+        <div className="bg-white p-4 rounded-lg shadow-md mt-6">
+          <h2 className="text-xl font-bold mb-4">Sales History for Product: {selectedProduct}</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={productSalesHistory}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="_id" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="totalQuantity" stroke="#8884d8" />
+              <Line type="monotone" dataKey="totalRevenue" stroke="#82ca9d" />
+            </LineChart>
+          </ResponsiveContainer>
+          <table className="min-w-full bg-white mt-4">
+            <thead>
+              <tr>
+                <th className="py-2">Date</th>
+                <th className="py-2">Quantity</th>
+                <th className="py-2">Price per Item</th>
+                <th className="py-2">Total Price</th>
+                <th className="py-2">Total Revenue</th>
+              </tr>
+            </thead>
+            <tbody>
+              {productSalesHistory.map((item, index) => (
+                <tr key={index}>
+                  <td className="py-2">{new Date(item._id).toLocaleDateString()}</td>
+                  <td className="py-2">{item.totalQuantity}</td>
+                  <td className="py-2">${(item.totalRevenue / item.totalQuantity).toFixed(2)}</td>
+                  <td className="py-2">${item.totalRevenue.toFixed(2)}</td>
+                  <td className="py-2">${item.totalRevenue.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <div className="bg-white p-4 rounded-lg shadow-md mt-6">
+        <h2 className="text-xl font-bold mb-4">Customer-Based Sales Analysis</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="bg-white p-4 rounded-lg shadow-md">
+            <h2 className="text-xl font-bold mb-2">New Customers</h2>
+            <p className="text-2xl">${customerSalesAnalysis.newCustomers}</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-md">
+            <h2 className="text-xl font-bold mb-2">Repeat Customers</h2>
+            <p className="text-2xl">${customerSalesAnalysis.repeatCustomers}</p>
+          </div>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold mb-4">Top Customer Segments</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={customerSalesAnalysis.topCustomerSegments}
+                dataKey="totalRevenue"
+                nameKey="_id"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                fill="#8884d8"
+                label
+              >
+                {customerSalesAnalysis.topCustomerSegments.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>

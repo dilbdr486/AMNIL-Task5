@@ -1,5 +1,6 @@
 import express from "express";
 import orderModel from "../models/orderModel.js";
+import { getProductSalesHistory, scheduleReport, getCustomerSalesAnalysis } from "../controllers/reportController.js";
 
 const reportRoutes = express.Router();
 
@@ -8,8 +9,17 @@ const parseDate = (date) => {
   return new Date(date);
 };
 
+// Middleware to validate date parameters
+const validateDates = (req, res, next) => {
+  const { startDate, endDate } = req.query;
+  if (!startDate || !endDate) {
+    return res.status(400).json({ error: "startDate and endDate are required" });
+  }
+  next();
+};
+
 // Total Sales Route
-reportRoutes.get("/total-sales", async (req, res) => {
+reportRoutes.get("/total-sales", validateDates, async (req, res) => {
   const { startDate, endDate } = req.query;
   try {
     const totalSales = await orderModel.calculateTotalSales(startDate, endDate);
@@ -20,7 +30,7 @@ reportRoutes.get("/total-sales", async (req, res) => {
 });
 
 // Total Revenue Route
-reportRoutes.get("/total-revenue", async (req, res) => {
+reportRoutes.get("/total-revenue", validateDates, async (req, res) => {
   const { startDate, endDate } = req.query;
   try {
     const totalRevenue = await orderModel.calculateTotalRevenue(startDate, endDate);
@@ -31,7 +41,7 @@ reportRoutes.get("/total-revenue", async (req, res) => {
 });
 
 // Conversion Rate Route
-reportRoutes.get("/conversion-rate", async (req, res) => {
+reportRoutes.get("/conversion-rate", validateDates, async (req, res) => {
   const { startDate, endDate } = req.query;
   try {
     const conversionRate = await orderModel.calculateConversionRate(startDate, endDate);
@@ -42,13 +52,13 @@ reportRoutes.get("/conversion-rate", async (req, res) => {
 });
 
 // Day-wise Report Route
-reportRoutes.get("/day-wise-report", async (req, res) => {
+reportRoutes.get("/day-wise-report", validateDates, async (req, res) => {
   const { startDate, endDate } = req.query;
   try {
     const parsedStartDate = parseDate(startDate);
     const parsedEndDate = parseDate(endDate);
     const report = await orderModel.generateDayWiseReport(parsedStartDate, parsedEndDate);
-    console.log(report);
+    // console.log(report);
     
     res.json(report);
   } catch (error) {
@@ -57,43 +67,43 @@ reportRoutes.get("/day-wise-report", async (req, res) => {
 });
 
 // Week-wise Report Route
-reportRoutes.get("/week-wise-report", async (req, res) => {
+reportRoutes.get("/week-wise-report", validateDates, async (req, res) => {
   const { startDate, endDate } = req.query;
-  console.log("Received request for week-wise report with dates:", startDate, endDate);
+  // console.log("Received request for week-wise report with dates:", startDate, endDate);
   try {
     const parsedStartDate = parseDate(startDate);
     const parsedEndDate = parseDate(endDate);
-    console.log("Parsed dates:", parsedStartDate, parsedEndDate);
+    // console.log("Parsed dates:", parsedStartDate, parsedEndDate);
 
     const report = await orderModel.generateWeekWiseReport(parsedStartDate, parsedEndDate);
-    console.log("Generated report:", report);
+    // console.log("Generated report:", report);
     res.json(report);
   } catch (error) {
-    console.error("Error generating week-wise report:", error);
+    // console.error("Error generating week-wise report:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
 // Month-wise Report Route
-reportRoutes.get("/month-wise-report", async (req, res) => {
+reportRoutes.get("/month-wise-report", validateDates, async (req, res) => {
   const { startDate, endDate } = req.query;
-  console.log("Received request for month-wise report with dates:", startDate, endDate);
+  // console.log("Received request for month-wise report with dates:", startDate, endDate);
   try {
     const parsedStartDate = parseDate(startDate);
     const parsedEndDate = parseDate(endDate);
-    console.log("Parsed dates:", parsedStartDate, parsedEndDate);
+    // console.log("Parsed dates:", parsedStartDate, parsedEndDate);
 
     const report = await orderModel.generateMonthWiseReport(parsedStartDate, parsedEndDate);
-    console.log("Generated report:", report);
+    // console.log("Generated report:", report);
     res.json(report);
   } catch (error) {
-    console.error("Error generating month-wise report:", error);
+    // console.error("Error generating month-wise report:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
 // Year-wise Report Route
-reportRoutes.get("/year-wise-report", async (req, res) => {
+reportRoutes.get("/year-wise-report", validateDates, async (req, res) => {
   const { startDate, endDate } = req.query;
   try {
     const parsedStartDate = parseDate(startDate);
@@ -106,7 +116,7 @@ reportRoutes.get("/year-wise-report", async (req, res) => {
 });
 
 // Total Report Route
-reportRoutes.get("/total-report", async (req, res) => {
+reportRoutes.get("/total-report", validateDates, async (req, res) => {
   const { startDate, endDate } = req.query;
   try {
     const parsedStartDate = parseDate(startDate);
@@ -119,7 +129,7 @@ reportRoutes.get("/total-report", async (req, res) => {
 });
 
 // Top Searched Products Route
-reportRoutes.get("/top-searched-products", async (req, res) => {
+reportRoutes.get("/top-searched-products", validateDates, async (req, res) => {
   const { startDate, endDate } = req.query;
   try {
     const parsedStartDate = parseDate(startDate);
@@ -132,7 +142,7 @@ reportRoutes.get("/top-searched-products", async (req, res) => {
 });
 
 // Year-over-Year (YoY) Growth Route
-reportRoutes.get("/yoy-growth", async (req, res) => {
+reportRoutes.get("/yoy-growth", validateDates, async (req, res) => {
   const { startDate, endDate } = req.query;
   try {
     const yoyGrowth = await orderModel.calculateYoYGrowth(startDate, endDate);
@@ -143,7 +153,7 @@ reportRoutes.get("/yoy-growth", async (req, res) => {
 });
 
 // Month-over-Month (MoM) Growth Route
-reportRoutes.get("/mom-growth", async (req, res) => {
+reportRoutes.get("/mom-growth", validateDates, async (req, res) => {
   const { startDate, endDate } = req.query;
   try {
     const momGrowth = await orderModel.calculateMoMGrowth(startDate, endDate);
@@ -154,7 +164,7 @@ reportRoutes.get("/mom-growth", async (req, res) => {
 });
 
 // Gross Profit Per Product Route
-reportRoutes.get("/gross-profit-per-product", async (req, res) => {
+reportRoutes.get("/gross-profit-per-product", validateDates, async (req, res) => {
   const { startDate, endDate } = req.query;
   try {
     const report = await orderModel.calculateGrossProfitPerProduct(startDate, endDate);
@@ -165,7 +175,7 @@ reportRoutes.get("/gross-profit-per-product", async (req, res) => {
 });
 
 // Margin Products Route
-reportRoutes.get("/margin-products", async (req, res) => {
+reportRoutes.get("/margin-products", validateDates, async (req, res) => {
   const { startDate, endDate } = req.query;
   try {
     const report = await orderModel.identifyMarginProducts(startDate, endDate);
@@ -190,6 +200,61 @@ reportRoutes.get("/verify-custom-orders", async (req, res) => {
   try {
     const count = await orderModel.verifyCustomOrders();
     res.json({ message: `Total orders in the database: ${count}` });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Product Sales History Route
+reportRoutes.get("/product-sales-history", validateDates, async (req, res) => {
+  const { productId, startDate, endDate } = req.query;
+
+  console.log("Received request for product sales history:", { productId, startDate, endDate });
+
+  if (!productId) {
+    return res.status(400).json({ error: "productId is required" });
+  }
+
+  try {
+    const parsedStartDate = new Date(startDate);
+    const parsedEndDate = new Date(endDate);
+
+    // Ensure endDate includes the full day
+    parsedEndDate.setHours(23, 59, 59, 999);
+
+    const salesHistory = await orderModel.getProductSalesHistory(productId, parsedStartDate, parsedEndDate);
+
+    console.log("Fetched sales history:", salesHistory);
+
+    if (!salesHistory || salesHistory.length === 0) {
+      console.log("No sales data found for this product in the given date range.");
+      return res.json({ message: "No sales data found for this product in the given date range." });
+    }
+
+    res.json(salesHistory);
+  } catch (error) {
+    console.error("Error fetching product sales history:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Schedule Report Route
+reportRoutes.post("/schedule-report", async (req, res) => {
+  const { email, frequency } = req.body;
+  try {
+    await scheduleReport(email, frequency);
+    res.status(201).json({ message: "Report scheduled successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Customer-Based Sales Analysis Route
+reportRoutes.get("/customer-sales-analysis", validateDates, async (req, res) => {
+  const { startDate, endDate } = req.query;
+  try {
+    const analysis = await getCustomerSalesAnalysis(startDate, endDate);
+    res.json(analysis);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
